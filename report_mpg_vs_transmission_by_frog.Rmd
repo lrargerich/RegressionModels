@@ -1,0 +1,110 @@
+---
+title: "Your Mileage Might Vary"
+author: "Frog"
+date: "Monday, August 04, 2014"
+output: pdf_document
+---
+
+## Executive Summary
+
+This report analyzes the mtcars database of cars to determine if according to that database the 
+transmission has a direct effect on the miles per gallon (mpg) that the car can travel. We will
+examine the dataset and try to see if there is a direct relationship between mpg and the type of
+transmission used in the card.
+
+My first step would be to check for cupholders but I'd better check the correlation between mpg and the other variables in the dataset.
+
+```{r}
+library(ggplot2)
+data(mtcars)
+cor(mtcars$mpg,mtcars)
+```
+
+From the correlation we observe that wt (weight) is the feature with higher correlation to mpg
+followed by cyl (cylinders). This makes sense as the heavier cars consume more than the light ones. I will name this observation #1 
+
+The first thing to check is if the am feature is skewed, if there are only a few cars of either class our conclusions can be very wrong. 
+
+```{r}
+mtcars$am<-as.factor(mtcars$am)
+levels(mtcars$am)<-c("auto","manual")
+summary(mtcars$am)
+```
+
+With 19 automatic cars and 13 manual cars in the dataset there's no skewing.
+
+Now I plot the mpg by the type of transmission
+
+```{r}
+qplot(mtcars$am,mtcars$mpg,geom="boxplot")
+```
+
+This plot shows that manual cars seem to have better mpg than automatic cars. I can verify this
+by a simple linear model.
+
+```{r}
+reg1<-lm(mtcars$mpg~mtcars$am)
+summary(reg1)
+```
+
+This model suggests that manual cars do 7.245mpg better than automatic cars.
+
+From observation #1 now I would like to check if there is a correlation between weight and the car being automatic or not.
+
+```{r}
+cor(as.numeric(mtcars$am),mtcars$wt)
+qplot(mtcars$wt,mtcars$mpg,color=mtcars$am)
+```
+
+We observe there's a strong correlation between weight and transmission. Manual cars are lighter
+than automatic cars. This leads to my second model of regression trying this time both weight and
+transmission as predictors for mpg.
+
+```{r}
+reg2<-lm(mtcars$mpg~as.numeric(mtcars$am) + mtcars$wt)
+summary(reg2)
+```
+
+Aha! It seems that now weight has a -5.35 influence over mpg but transmission is 0.02, in other
+words neutral. 
+
+I create a third model adding the cylinders (from observation #1) to check if this holds.
+
+```{r}
+reg3<-lm(mtcars$mpg~as.numeric(mtcars$am)+mtcars$wt+mtcars$cyl)
+summary(reg3)
+```
+
+It seems the weight impacts the mpg in 3.12mpg per ton, the number of cylinders also has something
+to say but the transmission has a very low impact. 
+
+Now I compare the three models using anova which curiously has nothing to do with astronomy.
+
+```{r}
+anova(reg1,reg2,reg3)
+```
+
+We observe model2 is better than 1 and 3, this doesn't mean that it is the best model for this
+dataset, we could have found that using fit.step but we are trying to buy a car and not a
+regression mode aren't we?
+
+Since the second model seems to be the better one, let's diagnose its residuals.
+
+Model 2: mpg ~ wt
+```{r}
+par(mfrow=c(2,2))
+plot(reg2)
+```
+
+Outliers! the world would be much better without them. We can see that even considering outliers there's a good fit for the residuals meaning our model is accurate.
+
+## Conclusion
+
+With this dataset we can't conclude if they type of transmission affects the fuel consumption of
+a car, lighter cars have better mpg than heavier cars. Manual transmission cars tend to be lighter
+than automatic cars and that's why they show better fuel consumption. 
+
+Buy a light car it doesn't matter if it has a stick or not.
+
+Finally: I know this went further than the 2 requiered pages and I could solve it moving the figures to appendixes but that would impact the clarity of the report so I prefer to lose a point than to lose my clarity. Thank you for understanding.
+
