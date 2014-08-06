@@ -2,7 +2,7 @@
 title: "Your Mileage Might Vary"
 author: "Frog"
 date: "Monday, August 04, 2014"
-output: pdf_document
+output: html_document
 ---
 
 ## Executive Summary
@@ -106,5 +106,5 @@ than automatic cars and that's why they show better fuel consumption.
 
 Buy a light car it doesn't matter if it has a stick or not.
 
-Finally: I know this went further than the 2 requiered pages and I could solve it moving the figures to appendixes but that would impact the clarity of the report so I prefer to lose a point than to lose my clarity. Thank you for understanding.
+
 
